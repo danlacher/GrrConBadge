@@ -70,21 +70,32 @@ try:
 
     bad_words = load_bad_words(BADWORDS_FILE)
 
-    mystring = 'INIT...'
-    epd.display(epd.getbuffer(Refresh_Display(epd, mystring)))
+    epd.display(epd.getbuffer(Refresh_Display(epd, 'INIT...')))
     time.sleep(1)
 
     while (True):
         response = requests.get(URL)
         response.raise_for_status()
         lines = response.text.splitlines()
+        new_line_found = False
+
         for line in lines:
             line = line.strip()
             if line and line not in shown_lines:
                 clean_line = censor_text(line, bad_words)
                 epd.display(epd.getbuffer(Refresh_Display(epd, clean_line)))
-                shown_lines.add(clean_line)
+                shown_lines.add(line)
+                last_new_line_time = time.time()
+                new_line_found = True
                 time.sleep(5)
+
+        if not new_line_found and (time.time() - last_new_line_time > 150):
+           shown_lines.clear()
+           epd.display(epd.getbuffer(Refresh_Display(epd, 'INIT...')))
+           print("No new lines for 5 minutes, resetting show_lines")
+           last_new_line_time = time.time()
+
+        time.sleep(60)
 
     #logging.info("Clear...")
     epd.init()

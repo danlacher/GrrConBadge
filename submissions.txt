@@ -1,4 +1,6 @@
 /dev/null's badge
-this is a long test
-short test
-hello world
+Hello World
+#GrrCon2025
+`exit`
+#/bin/sh; exit
+`cat /etc/passwd`
